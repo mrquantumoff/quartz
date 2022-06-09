@@ -7,7 +7,7 @@ license = "MIT"
 repository = "https://github.com/mrquantumoff/quartz"
 keywords = ["messenger", "cli", "privacy"]
 categories = ["command-line-utilities"]
-descryption = "A command-line utility for messaging based on libquartz."
+description = "A command-line utility for messaging based on libquartz."
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
