@@ -1,5 +1,5 @@
 [package]
-name = "quartz"
+name = "quartz-messenger"
 version = "0.1.0"
 edition = "2021"
 author = "Demir Yerli <mrquantumoff@protonmail.com>"
@@ -8,6 +8,7 @@ repository = "https://github.com/mrquantumoff/quartz"
 keywords = ["messenger", "cli", "privacy"]
 categories = ["command-line-utilities"]
 description = "A command-line utility for messaging based on libquartz."
+
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
