@@ -15,7 +15,7 @@ async fn main() {
     let _matches = Command::new("Quartz CLI Messenger")
         .subcommand_required(true)
         .version("0.1")
-        .author("Bultek. <help@bultek.com.ua>")
+        .author("Demir Yerli <mrquantumoff@protonmail.com>")
         .arg(
             Arg::new("debug")
                 .long("debug")
@@ -80,29 +80,6 @@ async fn main() {
                         .required(true),
                 ),
         )
-        .subcommand(
-            Command::new("messages")
-                .subcommand_required(true)
-                .about("Read/List Messages")
-                .subcommand(
-                    Command::new("list")
-                        .subcommand_required(false)
-                        .about("List Messages"),
-                )
-                .subcommand(
-                    Command::new("read")
-                        .subcommand_required(false)
-                        .about("Read Message")
-                        .arg(
-                            Arg::new("index")
-                                .short('i')
-                                .long("index")
-                                .takes_value(true)
-                                .help("Message index")
-                                .required(true),
-                        ),
-                ),
-        )
         .about("Libquartz based messenger")
         .get_matches();
 
@@ -115,28 +92,47 @@ async fn main() {
         get_msgs(_name, _index, &_key);
     }
     if let Some(subc) = _matches.subcommand_matches("send") {
-        let _index = subc.value_of("index").unwrap();
+        let _index = subc.value_of("index").unwrap().parse::<usize>();
         let _message = subc.value_of("message").unwrap();
         let _to = subc.value_of("to").unwrap();
         let _from = subc.value_of("from").unwrap();
-        println!("{}", _index);
-        println!("{}", _message);
-        println!("{}", _to);
-        println!("{}", _from);
-    }
-    if let Some(_subc) = _matches.subcommand_matches("messages") {
-        if let Some(_subc) = _subc.subcommand_matches("list") {
-            println!("list");
-        }
-        if let Some(subc) = _subc.subcommand_matches("read") {
-            let _index = subc.value_of("index").unwrap();
-            println!("{}", _index);
+        
+        match _index {
+            Ok(index) => send_msg(_from, _to, index, &_key, _message),
+            Err(_) => {
+                println!("{}", "Invalid argument \"index\"".bright_red());
+                std::process::exit(1);
+            }
         }
     }
 }
 
 
+fn send_msg(_from: &str, _to: &str, _server: usize, _key: &str, _message: &str) {
+    let servers = get_servers();
+    if servers.urls.is_empty() || _server >= servers.urls.len() {
+        println!("{}","Server out of range".bright_red());
+        std::process::exit(1);
+    }
+    println!("{}{}{}{}{}{}{}{}", "Sending message \"".bright_blue(), _message, "\" via server ".bright_blue(), servers.names[_server], " to ".bright_blue(), _to, " as ".bright_blue(), _from);
 
+    let resp = block_on(msgservices::send_msg(
+        servers.urls[_server].to_string()+"/incoming",
+        _message.to_string(),
+        _key.to_string(),
+        _to.to_string(),
+        _from.to_string(),
+    ));
+    match resp {
+        true => {
+            println!("{}", "Message sent".bright_green());
+        }
+        false => {
+            println!("{}", "Message sending failed".bright_red());
+            std::process::exit(1);
+        }
+    }
+}
 
 
 fn get_msgs(_name: &str, _index: &str, _key: &str) {
@@ -162,10 +158,12 @@ fn get_msgs(_name: &str, _index: &str, _key: &str) {
                     let index = &msgs.messages.iter().position(|x| x == msg).unwrap();
                     let index = index.to_string().parse::<usize>().unwrap();
                     println!(
-                        "{}{}{}",
-                        msg,
-                        "\n--------------------------\n from ".bright_blue(),
-                        msgs.senders[index]
+                        "{}{}{}{}{}",
+                        "\n--------------------------\n".bright_blue(),
+                        msg.trim(),
+                        "\n--------------------------\nfrom ".bright_blue(),
+                        msgs.senders[index].trim(),
+                        "\n \n"
                     );
                 }
             }
