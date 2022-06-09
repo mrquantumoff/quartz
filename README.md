@@ -17,5 +17,5 @@ $ cargo install --path .
 
 ## Installation via cargo (crates.io)
 ```shell
-$ cargo install quartz
+$ cargo install quartz-messenger
 ```
