@@ -13,7 +13,7 @@ descryption = "A command-line utility for messaging based on libquartz."
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-libquartz = { git = "https://github.com/Bultek/libquartz.git" }
+libquartz = { git = "https://github.com/Bultek/libquartz.git", version="0.1.0" }
 clap = "3.1"
 colored = "2.0"
 tokio = {version = "1.19.2", features = ["full"]}
