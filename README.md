@@ -8,9 +8,14 @@ $ quartz send -i <server_index> -t <to> -f <from> -m <message>
 $ quartz get -i <server_index> -a <as>
 ```
 
-## Installation via cargo
+## Installation via cargo (git)
 ```shell
-git clone https://github.com/mrquantumoff/quartz
-cd quartz
-cargo install --path .
+$ git clone https://github.com/mrquantumoff/quartz
+$ cd quartz
+$ cargo install --path . 
+```
+
+## Installation via cargo (crates.io)
+```shell
+$ cargo install quartz
 ```
