@@ -1,6 +1,6 @@
 [package]
 name = "quartz-messenger"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 author = "Demir Yerli <mrquantumoff@protonmail.com>"
 license = "MIT"

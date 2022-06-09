@@ -3,9 +3,9 @@
 
 ## Usage
 ```shell
-$ quartz -h
-$ quartz send -i <server_index> -t <to> -f <from> -m <message>
-$ quartz get -i <server_index> -a <as>
+$ quartz-messenger -h
+$ quartz-messenger send -i <server_index> -t <to> -f <from> -m <message>
+$ quartz-messenger get -i <server_index> -a <as>
 ```
 
 ## Installation via cargo (git)
