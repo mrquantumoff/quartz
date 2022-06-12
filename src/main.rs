@@ -1,9 +1,7 @@
 use clap::{Arg, Command};
 use colored::*;
-use futures::executor::block_on;
 use libquartz::{encryption, keytools, msgservices};
 use std::{env, fs, io::Read, path};
-
 
 struct ServerData {
     names: Vec<String>,
@@ -89,16 +87,16 @@ async fn main() {
     if let Some(subc) = _matches.subcommand_matches("get") {
         let _index = subc.value_of("index").unwrap();
         let _name = subc.value_of("as").unwrap();
-        get_msgs(_name, _index, &_key);
+        get_msgs(_name, _index, &_key).await;
     }
     if let Some(subc) = _matches.subcommand_matches("send") {
         let _index = subc.value_of("index").unwrap().parse::<usize>();
         let _message = subc.value_of("message").unwrap();
         let _to = subc.value_of("to").unwrap();
         let _from = subc.value_of("from").unwrap();
-        
+
         match _index {
-            Ok(index) => send_msg(_from, _to, index, &_key, _message),
+            Ok(index) => send_msg(_from, _to, index, &_key, _message).await,
             Err(_) => {
                 println!("{}", "Invalid argument \"index\"".bright_red());
                 std::process::exit(1);
@@ -107,22 +105,32 @@ async fn main() {
     }
 }
 
-
-fn send_msg(_from: &str, _to: &str, _server: usize, _key: &str, _message: &str) {
+async fn send_msg(_from: &str, _to: &str, _server: usize, _key: &str, _message: &str) {
     let servers = get_servers();
     if servers.urls.is_empty() || _server >= servers.urls.len() {
-        println!("{}","Server out of range".bright_red());
+        println!("{}", "Server out of range".bright_red());
         std::process::exit(1);
     }
-    println!("{}{}{}{}{}{}{}{}", "Sending message \"".bright_blue(), _message, "\" via server ".bright_blue(), servers.names[_server], " to ".bright_blue(), _to, " as ".bright_blue(), _from);
+    println!(
+        "{}{}{}{}{}{}{}{}",
+        "Sending message \"".bright_blue(),
+        _message,
+        "\" via server ".bright_blue(),
+        servers.names[_server],
+        " to ".bright_blue(),
+        _to,
+        " as ".bright_blue(),
+        _from
+    );
 
-    let resp = block_on(msgservices::send_msg(
-        servers.urls[_server].to_string()+"/incoming",
+    let resp = msgservices::send_msg(
+        servers.urls[_server].to_string() + "/incoming",
         _message.to_string(),
         _key.to_string(),
         _to.to_string(),
         _from.to_string(),
-    ));
+    )
+    .await;
     match resp {
         true => {
             println!("{}", "Message sent".bright_green());
@@ -134,8 +142,7 @@ fn send_msg(_from: &str, _to: &str, _server: usize, _key: &str, _message: &str) 
     }
 }
 
-
-fn get_msgs(_name: &str, _index: &str, _key: &str) {
+async fn get_msgs(_name: &str, _index: &str, _key: &str) {
     let servers = get_servers();
 
     let index = _index.parse::<usize>();
@@ -148,11 +155,11 @@ fn get_msgs(_name: &str, _index: &str, _key: &str) {
                 std::process::exit(1);
             } else {
                 let name = servers.names[i].clone();
-                println!("{}{}","Server name: ".bright_blue(), name.bright_blue());
+                println!("{}{}", "Server name: ".bright_blue(), name.bright_blue());
                 let url = &servers.urls[i];
                 let url = url.to_string() + "/messages";
                 let contact = encryption::encrypt_string(_key.to_string(), _name.to_string());
-                let resp = block_on(msgservices::get_msgs_encrypted(url, contact));
+                let resp = msgservices::get_msgs_encrypted(url, contact).await;
                 let msgs = msgservices::decrypt_msgs(resp, _key.to_string());
                 for msg in &msgs.messages {
                     let index = &msgs.messages.iter().position(|x| x == msg).unwrap();

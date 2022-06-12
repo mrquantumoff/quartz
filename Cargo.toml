@@ -1,6 +1,6 @@
 [package]
 name = "quartz-messenger"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 author = "Demir Yerli <mrquantumoff@protonmail.com>"
 license = "MIT"
@@ -18,4 +18,3 @@ libquartz = { git = "https://github.com/Bultek/libquartz.git", version="0.1.0" }
 clap = "3.1"
 colored = "2.0"
 tokio = {version = "1.19.2", features = ["full"]}
-futures = "0.3"
