@@ -10,7 +10,9 @@ struct ServerData {
 
 #[tokio::main]
 async fn main() {
-    let _wincolorfix = control::set_virtual_terminal(true).unwrap_or(());
+    #[cfg(windows)] {
+        let _wincolorfix = control::set_virtual_terminal(true).unwrap_or(());
+    }
     let _matches = Command::new("Quartz CLI Messenger")
         .subcommand_required(true)
         .version("0.1")
@@ -240,3 +242,4 @@ fn create_config() {
         fs::create_dir(&keyspath).expect("Could not create keys directory");
     }
 }
+
