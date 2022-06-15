@@ -1,4 +1,4 @@
-use clap::{Arg, Command};
+use clap::*;
 use colored::*;
 use libquartz::{encryption, keytools, msgservices};
 use std::{env, fs, io::Read, path};
@@ -10,6 +10,7 @@ struct ServerData {
 
 #[tokio::main]
 async fn main() {
+    let _wincolorfix = control::set_virtual_terminal(true).unwrap_or(());
     let _matches = Command::new("Quartz CLI Messenger")
         .subcommand_required(true)
         .version("0.1")
@@ -83,17 +84,17 @@ async fn main() {
 
     let _key = keytools::get_default_key();
 
-    let _debug = _matches.is_present("debug");
+    let _debug = ArgMatches::contains_id(&_matches, "debug");
     if let Some(subc) = _matches.subcommand_matches("get") {
-        let _index = subc.value_of("index").unwrap();
-        let _name = subc.value_of("as").unwrap();
+        let _index = subc.get_one::<String>("index").unwrap();
+        let _name = subc.get_one::<String>("as").unwrap();
         get_msgs(_name, _index, &_key).await;
     }
     if let Some(subc) = _matches.subcommand_matches("send") {
-        let _index = subc.value_of("index").unwrap().parse::<usize>();
-        let _message = subc.value_of("message").unwrap();
-        let _to = subc.value_of("to").unwrap();
-        let _from = subc.value_of("from").unwrap();
+        let _index = subc.get_one::<String>("index").unwrap().to_owned().parse::<usize>();
+        let _message = subc.get_one::<String>("message").unwrap();
+        let _to = subc.get_one::<String>("to").unwrap();
+        let _from = subc.get_one::<String>("from").unwrap();
 
         match _index {
             Ok(index) => send_msg(_from, _to, index, &_key, _message).await,
